@@ -1,0 +1,37 @@
+<script type="text/javascript" src="http://css2xpath.googlecode.com/svn/trunk/build/css2xpath.min.js"><!--// (C) Andrea Giammarchi //--></script>
+<div>
+    <span>CSS selector</span>
+    <br />
+    <input type="text" /><button>to xpath</button>
+</div>
+<script type="text/javascript">
+var test = (function(list){
+    function onclick(){
+        if(input.value)
+            document.query("pre").forEach(function(p, i){
+                p.innerHTML = "<strong style='color:#999'>" + list[i].name + "</strong>";
+                p.insertAdjacentText("beforeEnd", "\n" + list[i].callback(input.value));
+            });
+    };
+    var input   = document.query("input")[0];
+    document.query("button")[0].attachEvent("onclick", onclick);
+    input.attachEvent("onkeypress", function(){
+        if(event.keyCode === 0 || event.keyCode === 13)
+            onclick();
+    });
+    return function(name, callback){
+        list.push({name:name || "no name", callback:callback || function(){return "no callback"}});
+    };
+})([]);
+</script>
+
+<pre>&nbsp;</pre>
+<script type="text/javascript">test("document.query.css2xpath", document.query.css2xpath);</script>
+<!--// add other libraries, if any, to compare results. Registers them via
+test("name to display", callbackToCall);
+@example
+
+<pre>&nbsp;</pre>
+<script type="text/javascript" src="http://james.padolsey.com/scripts/javascript/css2xpath.js"></script>
+<script type="text/javascript">test("James Padolsey CSS2XPATH", CSS2XPATH);</script>
+//-->
