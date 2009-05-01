@@ -74,13 +74,22 @@
                                         valid = true;
                                     } catch(e) {
                                     };
-                                    p.innerText = [
-                                        "Function   : " + list[i].name,
-                                        "Result     : " + xpathselector,
-                                        "Valid      : " + valid,
-                                        valid ? "Found      : " + length : "",
-                                        "Via Sizzle : " + Sizzle(value, dom).length
-                                    ].join("\n");
+                                    var innerText = [
+                                        "Function               : " + list[i].name,
+                                        "Result                 : " + xpathselector,
+                                        "Valid                  : " + valid,
+                                        valid ?
+                                        "Found                  : " + length : "",
+                                        "Via Sizzle             : " + Sizzle(value, dom).length
+                                    ];
+                                    if(document.querySelectorAll){
+                                        try{
+                                            innerText.push("Via querySelectorAll   : " + document.querySelectorAll(value).length);
+                                        } catch(e) {
+                                            innerText.push("Via querySelectorAll   : " + e.message);
+                                        }
+                                    };
+                                    p.innerText = innerText.join("\n");
                                 } catch(e) {
                                     p.innerHTML = "<strong style='color:#999'>" + list[i].name + "</strong> failed: " + e.message;
                                 }
