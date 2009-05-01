@@ -1,38 +1,129 @@
-<script type="text/javascript" src="http://vice-versa.googlecode.com/svn/trunk/build/vice-versa.min.js"><!--// (C) Andrea Giammarchi //--></script>
-<script type="text/javascript" src="http://css2xpath.googlecode.com/svn/trunk/build/css2xpath.min.js"><!--// (C) Andrea Giammarchi //--></script>
-<div>
-    <span>CSS selector</span>
-    <br />
-    <input type="text" /><button>to xpath</button>
-</div>
-<script type="text/javascript">
-var test = (function(list){
-    function onclick(){
-        if(input.value)
-            document.query("pre").forEach(function(p, i){
-                p.innerHTML = "<strong style='color:#999'>" + list[i].name + "</strong>";
-                p.insertAdjacentText("beforeEnd", "\n" + list[i].callback(input.value));
-            });
-    };
-    var input   = document.query("input")[0];
-    document.query("button")[0].attachEvent("onclick", onclick);
-    input.attachEvent("onkeypress", function(){
-        if(event.keyCode === 0 || event.keyCode === 13)
-            onclick();
-    });
-    return function(name, callback){
-        list.push({name:name || "no name", callback:callback || function(){return "no callback"}});
-    };
-})([]);
-</script>
-
-<pre>&nbsp;</pre>
-<script type="text/javascript">test("css2xpath", css2xpath);</script>
-<!--// add other libraries, if any, to compare results. Registers them via
-test("name to display", callbackToCall);
-@example
-
-<pre>&nbsp;</pre>
-<script type="text/javascript" src="http://james.padolsey.com/scripts/javascript/css2xpath.js"></script>
-<script type="text/javascript">test("James Padolsey CSS2XPATH", CSS2XPATH);</script>
-//-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>css2xpath live test</title>
+        <style type="text/css">
+        * {
+            font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Verdana, Tahoma, sans-serif;
+            font-weight: normal;
+            font-size: 1em;
+        }
+        pre, span, input, button {
+            font-size: .8em;
+        }
+        input, button {
+            border: 1px solid silver;
+        }
+        input {
+            width: 400px;
+        }
+        button {
+            width: 100px;
+        }
+        button {
+            border-left: 0;
+        }
+        button:hover {
+            background-color: silver;
+            color: #FFF;
+        }
+        iframe {
+            border: 1px solid silver;
+            width: 500px;
+            height: 200px;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+        }
+        div {
+            position: absolute;
+            top: 204px;
+            left: 4px;
+        }
+        pre {
+            font-family: monospace;
+            font-size: .9em;
+        }
+        body {
+            visibility: hidden;
+        }
+        </style>
+        <script type="text/javascript" src="http://vice-versa.googlecode.com/svn/trunk/build/vice-versa.min.js"><!--// (C) Andrea Giammarchi //--></script>
+        <script type="text/javascript" src="http://css2xpath.googlecode.com/svn/trunk/build/css2xpath.min.js"><!--// (C) Andrea Giammarchi //--></script>
+        <script type="text/javascript" src="http://css2xpath.googlecode.com/svn/trunk/src/html2xml.js"><!--// (C) Andrea Giammarchi //--></script>
+        <script type="text/javascript" src="http://github.com/jeresig/sizzle/raw/master/sizzle.js"><!--// (C) John Resig //--></script>
+        <script type="text/javascript">
+        attachEvent("onload", function(){
+            function onload(){
+                iframe.onreadystatechange = iframe.onload = function(){};
+                var dom     = iframe.contentWindow.document.documentElement,
+                    xml     = html2xml(dom),
+                    test    = (function(list){
+                    function onclick(){
+                        var value = input.value.trim();
+                        if(value)
+                            document.query("pre").forEach(function(p, i){
+                                try {
+                                    var length          = 0,
+                                        valid           = false,
+                                        xpathselector   = list[i].callback(value);
+                                    try {
+                                        var node, result = xml.selectNodes(xpathselector);
+                                        while(node = result.nextNode())
+                                            ++length;
+                                        valid = true;
+                                    } catch(e) {
+                                    };
+                                    p.innerText = [
+                                        "Function   : " + list[i].name,
+                                        "Result     : " + xpathselector,
+                                        "Valid      : " + valid,
+                                        valid ? "Found      : " + length : "",
+                                        "Via Sizzle : " + Sizzle(value, dom).length
+                                    ].join("\n");
+                                } catch(e) {
+                                    p.innerHTML = "<strong style='color:#999'>" + list[i].name + "</strong> failed: " + e.message;
+                                }
+                            });
+                    };
+                    var input   = document.query("input")[0],
+                        button  = document.query("button")[0]
+                    ;
+                    button.attachEvent("onclick", onclick);
+                    button.attachEvent("onfocus", function(){button.blur()});
+                    input.attachEvent("onkeypress", function(){
+                        if(event.keyCode === 0 || event.keyCode === 13)
+                            onclick();
+                    });
+                    return function(name, callback){
+                        list.push({name:name || "no name", callback:callback || function(){return "no callback"}});
+                    };
+                })([]);
+                document.body.style.visibility = "visible";
+                
+                // add a script tag in the header
+                // add a pre tag in the body
+                // register another selector
+                test("css2xpath", css2xpath);
+                
+                
+            };
+            var iframe = document.body.appendChild(document.createElement("iframe"));
+            iframe.onreadystatechange = function(){
+                if(/loaded|complete/i.test(iframe.readyState))
+                    onload();
+            };
+            iframe.onload = onload;
+            iframe.src = "w3c.selectors.html";
+        });
+        </script>
+    </head>
+    <body>
+        <div>
+            <span>Write a CSS selector and press enter or to xpath button to view the result</span>
+            <br />
+            <input type="text" /><button>to xpath</button>
+            <pre>&nbsp;</pre>
+        </div>
+    </body>
+</html>
