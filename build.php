@@ -31,7 +31,7 @@ if(file_exists($file))
 if(file_exists($filemin))
     unlink($filemin);
 file_put_contents($file, $output);
-exec('java -jar yuicompressor-2.4.2.jar '.$file.' -o '.$filemin);
+exec('java -jar yuicompressor-2.4.2.jar --nomunge '.$file.' -o '.$filemin);
 $min = $cl.file_get_contents($filemin);
 file_put_contents($filemin, $min);
 ob_start('ob_gzhandler');
